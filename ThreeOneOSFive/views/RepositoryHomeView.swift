@@ -12,6 +12,7 @@ struct RepositoryHomeView: View {
     @Environment(\.appLanguage) private var language
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @EnvironmentObject private var store: PackageRepositoryStore
+    @EnvironmentObject private var patchStore: PatchProjectStore
     @State private var feed: [RepositoryPackageRecord] = []
     @State private var showPatchImporter = false
 
@@ -79,7 +80,7 @@ struct RepositoryHomeView: View {
                         showPatchImporter = false
                         guard case .success(let urls) = result,
                               let url = urls.first else { return }
-                        store.importPackage(at: url)
+                        patchStore.importPackage(at: url)
                     },
                     onCancel: {
                         showPatchImporter = false
