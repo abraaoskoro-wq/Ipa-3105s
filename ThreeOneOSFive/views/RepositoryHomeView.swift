@@ -17,6 +17,7 @@ struct RepositoryHomeView: View {
 
     let onOpenSettings: () -> Void
     let onOpenLogs: () -> Void
+    let onOpenInject: () -> Void
 
     var body: some View {
         NavigationStack {
@@ -44,7 +45,7 @@ struct RepositoryHomeView: View {
             .refreshable {
                 await store.refreshAllAndWait()
             }
-            .navigationTitle("3105")
+            .navigationTitle("Home")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 AppUtilityToolbar(
@@ -84,33 +85,32 @@ struct RepositoryHomeView: View {
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
 
-            HStack(spacing: 14) {
-                AppRowIcon(
-                    systemName: "iphone",
-                    tint: AppTheme.accent,
-                    symbolSize: 19,
-                    frameSize: 48
-                )
-                VStack(alignment: .leading, spacing: 5) {
-                    Text("\(AppInfo.hardwareDisplayName) compatível")
-                        .font(.headline)
-                        .foregroundStyle(.white)
-                    Text("iOS \(AppInfo.osVersion) · acesso disponível")
-                        .font(.subheadline)
-                        .foregroundStyle(.white.opacity(0.72))
+            Button(action: onOpenSettings) {
+                HStack(spacing: 14) {
+                    AppRowIcon(systemName: "iphone", tint: AppTheme.accent, symbolSize: 19, frameSize: 48)
+                    VStack(alignment: .leading, spacing: 5) {
+                        Text("\(AppInfo.hardwareDisplayName) compatível")
+                            .font(.headline)
+                            .foregroundStyle(.white)
+                        Text("iOS \(AppInfo.osVersion) · acesso disponível")
+                            .font(.subheadline)
+                            .foregroundStyle(.white.opacity(0.72))
+                    }
+                    Spacer(minLength: 8)
+                    VStack(spacing: 5) {
+                        Circle()
+                            .fill(appState.isSupported ? Color.green : AppTheme.accent)
+                            .frame(width: 12, height: 12)
+                        Text(appState.isSupported ? "OK" : "—")
+                            .font(.caption)
+                            .foregroundStyle(.white.opacity(0.72))
+                    }
                 }
-                Spacer(minLength: 8)
-                VStack(spacing: 5) {
-                    Circle()
-                        .fill(appState.isSupported ? Color.green : AppTheme.accent)
-                        .frame(width: 12, height: 12)
-                    Text(appState.isSupported ? "OK" : "—")
-                        .font(.caption)
-                        .foregroundStyle(.white.opacity(0.72))
-                }
+                .padding(AppTheme.contentCardPadding)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
-            .padding(AppTheme.contentCardPadding)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .buttonStyle(.plain)
             .background(GlassCardBackground())
             .overlay { GlassCardBorder() }
         }
@@ -123,27 +123,15 @@ struct RepositoryHomeView: View {
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
 
-            Button {
-                showPatchImporter = true
-            } label: {
+            Button { showPatchImporter = true } label: {
                 HStack(spacing: 14) {
-                    AppRowIcon(
-                        systemName: "square.and.arrow.down",
-                        tint: AppTheme.accent,
-                        symbolSize: 18,
-                        frameSize: 40
-                    )
+                    AppRowIcon(systemName: "square.and.arrow.down", tint: AppTheme.accent, symbolSize: 18, frameSize: 40)
                     VStack(alignment: .leading, spacing: 4) {
-                        Text("Importar arquivo .3105")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                        Text("Adicione um pacote pelo app Arquivos")
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.72))
+                        Text("Importar arquivo .3105").font(.headline).foregroundStyle(.white)
+                        Text("Adicione um pacote pelo app Arquivos").font(.subheadline).foregroundStyle(.white.opacity(0.72))
                     }
                     Spacer(minLength: 8)
-                    Image(systemName: "chevron.right")
-                        .foregroundStyle(AppTheme.accent)
+                    Image(systemName: "chevron.right").foregroundStyle(AppTheme.accent)
                 }
                 .padding(AppTheme.contentCardPadding)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -153,31 +141,26 @@ struct RepositoryHomeView: View {
             .background(GlassCardBackground())
             .overlay { GlassCardBorder() }
 
-            VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 14) {
-                    AppRowIcon(
-                        systemName: "shippingbox",
-                        tint: AppTheme.accent,
-                        symbolSize: 19,
-                        frameSize: 40
-                    )
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Patches instalados")
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                        Text("Ative, desative e restaure seus arquivos")
-                            .font(.subheadline)
-                            .foregroundStyle(.white.opacity(0.72))
+            Button(action: onOpenInject) {
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 14) {
+                        AppRowIcon(systemName: "shippingbox", tint: AppTheme.accent, symbolSize: 19, frameSize: 40)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("Arquivos instalados").font(.headline).foregroundStyle(.white)
+                            Text("Ative, desative e restaure seus arquivos").font(.subheadline).foregroundStyle(.white.opacity(0.72))
+                        }
                     }
+                    Text("Abrir Injetar para gerenciar")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(AppTheme.accent)
+                        .padding(.leading, 54)
+                        .padding(.top, 8)
                 }
-                Text("Use a aba Injetar para gerenciar")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(AppTheme.accent)
-                    .padding(.leading, 54)
-                    .padding(.top, 8)
+                .padding(AppTheme.contentCardPadding)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .contentShape(Rectangle())
             }
-            .padding(AppTheme.contentCardPadding)
-            .frame(maxWidth: .infinity, alignment: .leading)
+            .buttonStyle(.plain)
             .background(GlassCardBackground())
             .overlay { GlassCardBorder() }
         }

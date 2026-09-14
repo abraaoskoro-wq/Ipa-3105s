@@ -125,7 +125,8 @@ struct ContentView: View {
         case .home:
             RepositoryHomeView(
                 onOpenSettings: openSettings,
-                onOpenLogs: openLogs
+                onOpenLogs: openLogs,
+                onOpenInject: { tabNavigation.select(AppSection.installed.rawValue) }
             )
         case .new:
             RepositoryNewView(
