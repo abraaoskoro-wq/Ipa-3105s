@@ -9,6 +9,7 @@ private enum HomePatchPickerPolicy {
 }
 
 struct RepositoryHomeView: View {
+    @Environment(\.appLanguage) private var language
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var store: PackageRepositoryStore
     @EnvironmentObject private var patchStore: PatchProjectStore
@@ -47,7 +48,7 @@ struct RepositoryHomeView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 AppUtilityToolbar(
-                    language: AppLanguage.english,
+                    language: language,
                     onOpenSettings: onOpenSettings,
                     onOpenLogs: onOpenLogs
                 )
