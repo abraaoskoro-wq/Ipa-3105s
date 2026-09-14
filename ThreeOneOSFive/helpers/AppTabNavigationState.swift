@@ -43,15 +43,21 @@ struct FeatureVisibility: Equatable {
     }
 
     var visibleSections: [AppSection] {
-        AppSection.allCases.filter(isVisible)
+        var sections: [AppSection] = [.home, .installed]
+        if developerModeEnabled {
+            sections.append(.files)
+        }
+        return sections
     }
 
     func isVisible(_ section: AppSection) -> Bool {
         switch section {
         case .files:
             return developerModeEnabled
-        default:
+        case .home, .installed:
             return true
+        default:
+            return false
         }
     }
 }

@@ -90,6 +90,19 @@ struct PatchProjectsView: View {
     var body: some View {
         NavigationStack {
             VStack(spacing: 0) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(language.text("inject.resources"))
+                        .font(.caption.weight(.bold))
+                        .tracking(3)
+                        .foregroundStyle(AppTheme.accent)
+                    Text(language.text("inject.subtitle"))
+                        .font(.title2.weight(.bold))
+                        .foregroundStyle(.primary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, AppTheme.pageInset)
+                .padding(.top, 14)
+                .padding(.bottom, 8)
                 AppSearchField(
                     text: $searchText,
                     prompt: language.text("installed.search"),
@@ -153,7 +166,7 @@ struct PatchProjectsView: View {
                 }
                 .listStyle(.insetGrouped)
             }
-            .navigationTitle(language.text("tab.installed"))
+            .navigationTitle(language.text("tab.inject"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
@@ -511,16 +524,18 @@ private struct PatchProjectRow: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Toggle(
-                "",
-                isOn: Binding(
-                    get: { DevicePatchService.latestReceipt(projectID: item.id) != nil },
-                    set: { store.setActive(item, active: $0) }
+            if item.project != nil {
+                Toggle(
+                    "",
+                    isOn: Binding(
+                        get: { DevicePatchService.latestReceipt(projectID: item.id) != nil },
+                        set: { store.setActive(item, active: $0) }
+                    )
                 )
-            )
-            .labelsHidden()
-            .tint(AppTheme.accent)
-            .disabled(store.isBusy)
+                .labelsHidden()
+                .tint(AppTheme.accent)
+                .disabled(store.isBusy)
+            }
             if item.summary.isPasswordProtected {
                 Image(systemName: "key.fill")
                     .font(.caption)

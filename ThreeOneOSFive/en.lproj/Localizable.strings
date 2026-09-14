@@ -187,6 +187,9 @@
 "patch.password_existing_footer" = "This setting cannot be changed after creation.";
 "patch.active_title" = "Patch Active";
 "patch.active_message" = "The imported patch is currently applied.";
+"tab.inject" = "Inject";
+"inject.resources" = "RESOURCES";
+"inject.subtitle" = "Control your resources";
 "patch.password_once_message" = "After a successful unlock, this device remembers the content key—not the password.";
 "patch.password_repo_contact" = "This repository does not share the password. Contact the owner of %@ to get it. After unlocking, this device remembers only the content key—not the password.";
 "patch.unlock" = "Unlock";

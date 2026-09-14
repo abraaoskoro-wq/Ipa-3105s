@@ -187,6 +187,9 @@
 "patch.password_existing_footer" = "Thiết lập này không thể thay đổi sau khi tạo.";
 "patch.active_title" = "Patch đang hoạt động";
 "patch.active_message" = "Patch đã nhập hiện đang được áp dụng.";
+"tab.inject" = "Inject";
+"inject.resources" = "TÀI NGUYÊN";
+"inject.subtitle" = "Kiểm soát tài nguyên của bạn";
 "patch.password_once_message" = "Sau khi mở khóa thành công, thiết bị này chỉ nhớ khóa nội dung, không lưu mật khẩu.";
 "patch.password_repo_contact" = "Repo này không chia sẻ mật khẩu. Hãy liên hệ chủ repo %@ để lấy mật khẩu. Sau khi mở khóa, thiết bị chỉ nhớ khóa nội dung, không lưu mật khẩu.";
 "patch.unlock" = "Mở khóa";

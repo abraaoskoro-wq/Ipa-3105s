@@ -187,6 +187,9 @@
 "patch.password_existing_footer" = "创建后无法更改此设置。";
 "patch.active_title" = "补丁已生效";
 "patch.active_message" = "已导入的补丁当前正在应用。";
+"tab.inject" = "注入";
+"inject.resources" = "资源";
+"inject.subtitle" = "控制你的资源";
 "patch.password_once_message" = "成功解锁后，此设备只会记住内容密钥，不会保存密码。";
 "patch.password_repo_contact" = "此软件源未共享密码。请联系 %@ 的所有者获取密码。解锁后，此设备只会记住内容密钥，不会保存密码。";
 "patch.unlock" = "解锁";
