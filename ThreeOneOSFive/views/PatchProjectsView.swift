@@ -103,21 +103,12 @@ struct PatchProjectsView: View {
                 .padding(.horizontal, AppTheme.pageInset)
                 .padding(.top, 14)
                 .padding(.bottom, 8)
-                AppSearchField(
-                    text: $searchText,
-                    prompt: language.text("installed.search"),
-                    clearLabel: language.text("common.clear")
-                )
-                Divider()
                 List {
                     if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
                         loadingState
                             .listRowSeparator(.hidden)
                     } else if !hasLocalContent {
                         emptyState
-                            .listRowSeparator(.hidden)
-                    } else if !hasSearchResults && !store.isBusy {
-                        searchEmptyState
                             .listRowSeparator(.hidden)
                     } else {
                         if !filteredItems.isEmpty {
@@ -130,38 +121,6 @@ struct PatchProjectsView: View {
                                 }
                             }
                         }
-                        if !filteredWallpaperPackages.isEmpty {
-                            Section(language.text("tab.wallpapers")) {
-                                ForEach(filteredWallpaperPackages) { package in
-                                    NavigationLink {
-                                        InstalledWallpaperPackageDetailView(
-                                            package: package,
-                                            onApplied: reloadWallpaperPackages
-                                        )
-                                    } label: {
-                                        wallpaperRow(package)
-                                    }
-                                    .swipeActions(
-                                        edge: .trailing,
-                                        allowsFullSwipe: false
-                                    ) {
-                                        Button(role: .destructive) {
-                                            wallpaperPendingDeletion = package
-                                        } label: {
-                                            Label(
-                                                language.text("common.delete"),
-                                                systemImage: "trash"
-                                            )
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    if cleanerEnabled {
-                        Section(language.text("repository.utilities")) {
-                            cleanerRow
-                        }
                     }
                 }
                 .listStyle(.insetGrouped)
@@ -169,36 +128,6 @@ struct PatchProjectsView: View {
             .navigationTitle(language.text("tab.inject"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Menu {
-                        Button {
-                            showCreate = true
-                        } label: {
-                            Label(language.text("patch.new"), systemImage: "doc.badge.plus")
-                        }
-                        Button {
-                            showImporter = true
-                        } label: {
-                            Label(language.text("patch.import"), systemImage: "square.and.arrow.down")
-                        }
-                        Button {
-                            showWallpaperImporter = true
-                        } label: {
-                            Label(
-                                language.text("wallpaper.import"),
-                                systemImage: "photo.badge.plus"
-                            )
-                        }
-                    } label: {
-                        if store.isBusy || isImportingWallpapers {
-                            ProgressView()
-                        } else {
-                            Image(systemName: "plus")
-                        }
-                    }
-                    .disabled(store.isBusy || isImportingWallpapers)
-                    .accessibilityLabel(language.text("patch.add"))
-                }
                 AppUtilityToolbar(
                     language: language,
                     onOpenSettings: onOpenSettings,
@@ -433,18 +362,12 @@ struct PatchProjectsView: View {
 
     @ViewBuilder
     private func itemRow(_ item: PatchLibraryItem) -> some View {
-        if item.isLocked {
-            Button { store.requestUnlock(for: item) } label: {
-                PatchProjectRow(item: item, language: language, store: store)
-            }
-            .buttonStyle(.plain)
-        } else {
-            NavigationLink {
-                PatchProjectDetailView(store: store, projectID: item.id)
-            } label: {
-                PatchProjectRow(item: item, language: language, store: store)
-            }
+        Button {
+            if item.isLocked { store.requestUnlock(for: item) }
+        } label: {
+            PatchProjectRow(item: item, language: language, store: store)
         }
+        .buttonStyle(.plain)
     }
 
     private var emptyState: some View {
@@ -513,13 +436,7 @@ private struct PatchProjectRow: View {
                     .font(.body.weight(.semibold))
                     .foregroundStyle(.primary)
                     .lineLimit(1)
-                InstalledContentKindBadge(kind: .patch, language: language)
-                if let author = item.project?.author, !author.isEmpty {
-                    Text(language.text("patch.by_author", author))
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Text(rowDetail)
+                Text(item.project == nil ? "Bloqueado" : "Patch")
                     .font(.caption)
                     .foregroundStyle(.secondary)
             }
@@ -536,36 +453,10 @@ private struct PatchProjectRow: View {
                 .tint(AppTheme.accent)
                 .disabled(store.isBusy)
             }
-            if item.summary.isPasswordProtected {
-                Image(systemName: "key.fill")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-                    .accessibilityLabel(language.text("patch.password_protected"))
-            }
-            if item.project?.isPrivate == true {
-                Image(systemName: "eye.slash.fill")
-                    .font(.caption)
-                    .foregroundStyle(AppTheme.accent)
-                    .accessibilityLabel(language.text("patch.private"))
-            }
         }
         .padding(.vertical, 4)
     }
 
-    private var rowDetail: String {
-        if item.isLocked {
-            return language.text("patch.tap_to_unlock")
-        }
-        if item.project?.isPrivate == true, !item.isAuthorCopy {
-            return language.text("patch.private_received")
-        }
-        return language.text(
-            item.summary.schemaVersion >= 2
-                ? "patch.workspace_items_count"
-                : "patch.rules_count",
-            Int64((item.project?.rules.count ?? 0) + (item.project?.directories.count ?? 0))
-        )
-    }
 }
 
 private enum InstalledContentKind {
