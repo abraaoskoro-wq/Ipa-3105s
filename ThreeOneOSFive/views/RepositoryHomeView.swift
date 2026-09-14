@@ -20,11 +20,14 @@ struct RepositoryHomeView: View {
     var body: some View {
         NavigationStack {
             ZStack {
+                Color.black
+                    .ignoresSafeArea()
+
                 Image("HomeBackground")
                     .resizable()
-                    .scaledToFill()
+                    .scaledToFit()
                     .overlay(Color.black.opacity(0.18))
-                    .ignoresSafeArea()
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 28) {
