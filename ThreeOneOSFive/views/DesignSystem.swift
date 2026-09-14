@@ -22,6 +22,40 @@ enum AppTheme {
     static let contentCardCornerRadius: CGFloat = 20
     static let contentCardInset: CGFloat = 16
     static let contentCardPadding: CGFloat = 16
+    static let glassCardOpacity: CGFloat = 0.10
+    static let glassCardBorderOpacity: CGFloat = 0.24
+}
+
+struct GlassCardBackground: View {
+    var body: some View {
+        RoundedRectangle(
+            cornerRadius: AppTheme.contentCardCornerRadius,
+            style: .continuous
+        )
+        .fill(.ultraThinMaterial)
+        .overlay {
+            RoundedRectangle(
+                cornerRadius: AppTheme.contentCardCornerRadius,
+                style: .continuous
+            )
+            .fill(AppTheme.accent.opacity(AppTheme.glassCardOpacity))
+        }
+    }
+}
+
+struct GlassCardBorder: View {
+    var body: some View {
+        RoundedRectangle(
+            cornerRadius: AppTheme.contentCardCornerRadius,
+            style: .continuous
+        )
+        .strokeBorder(
+            Color.white.opacity(AppTheme.glassCardBorderOpacity),
+            lineWidth: 0.8
+        )
+        .shadow(color: .black.opacity(0.28), radius: 12, y: 7)
+        .accessibilityHidden(true)
+    }
 }
 
 struct AppCardBorder: View {

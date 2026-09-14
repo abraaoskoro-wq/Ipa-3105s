@@ -136,15 +136,9 @@ struct RepositoryHomeView: View {
                         }
                     }
                 }
-                .background(
-                    Color(uiColor: .systemBackground),
-                    in: RoundedRectangle(
-                        cornerRadius: AppTheme.contentCardCornerRadius,
-                        style: .continuous
-                    )
-                )
+                .background(GlassCardBackground())
                 .overlay {
-                    AppCardBorder()
+                    GlassCardBorder()
                 }
             }
         }
@@ -176,15 +170,9 @@ struct RepositoryHomeView: View {
         .frame(maxWidth: .infinity)
         .padding(.horizontal, 20)
         .padding(.vertical, 48)
-        .background(
-            Color(uiColor: .systemBackground),
-            in: RoundedRectangle(
-                cornerRadius: AppTheme.contentCardCornerRadius,
-                style: .continuous
-            )
-        )
+        .background(GlassCardBackground())
         .overlay {
-            AppCardBorder()
+            GlassCardBorder()
         }
     }
 
