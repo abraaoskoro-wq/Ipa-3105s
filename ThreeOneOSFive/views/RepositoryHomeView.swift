@@ -1,10 +1,19 @@
 import SwiftUI
+import UniformTypeIdentifiers
+
+private enum HomePatchPickerPolicy {
+    static let allowedContentTypes: [UTType] = [
+        UTType(filenameExtension: "3105") ?? .data,
+        .data
+    ]
+}
 
 struct RepositoryHomeView: View {
     @Environment(\.appLanguage) private var language
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @EnvironmentObject private var store: PackageRepositoryStore
     @State private var feed: [RepositoryPackageRecord] = []
+    @State private var showPatchImporter = false
 
     let onOpenSettings: () -> Void
     let onOpenLogs: () -> Void
@@ -19,13 +28,14 @@ struct RepositoryHomeView: View {
                     .ignoresSafeArea()
 
                 ScrollView {
-                LazyVStack(alignment: .leading, spacing: 28) {
-                    if feed.isEmpty {
-                        emptyContent
-                    } else {
-                        featuredFeed
-                        recentPackages
-                    }
+                    LazyVStack(alignment: .leading, spacing: 28) {
+                        importPatchCard
+                        if feed.isEmpty {
+                            emptyContent
+                        } else {
+                            featuredFeed
+                            recentPackages
+                        }
 
                 }
                 .frame(maxWidth: 720)
@@ -60,7 +70,57 @@ struct RepositoryHomeView: View {
             .onChange(of: store.packages) { _ in
                 rebuildFeed()
             }
+            .sheet(isPresented: $showPatchImporter) {
+                FileDocumentPicker(
+                    allowedContentTypes: HomePatchPickerPolicy.allowedContentTypes,
+                    copiesSelectedDocument: true,
+                    allowsMultipleSelection: false,
+                    onSelection: { result in
+                        showPatchImporter = false
+                        guard case .success(let urls) = result,
+                              let url = urls.first else { return }
+                        store.importPackage(at: url)
+                    },
+                    onCancel: {
+                        showPatchImporter = false
+                    }
+                )
+                .ignoresSafeArea()
+            }
         }
+    }
+
+    private var importPatchCard: some View {
+        Button {
+            showPatchImporter = true
+        } label: {
+            HStack(spacing: 14) {
+                AppRowIcon(
+                    systemName: "square.and.arrow.down",
+                    tint: AppTheme.accent,
+                    symbolSize: 18,
+                    frameSize: 40
+                )
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("Importar arquivo .3105")
+                        .font(.headline)
+                        .foregroundStyle(.primary)
+                    Text("Escolha um arquivo pelo app Arquivos")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
+                Image(systemName: "chevron.right")
+                    .font(.subheadline.weight(.semibold))
+                    .foregroundStyle(AppTheme.accent)
+            }
+            .padding(AppTheme.contentCardPadding)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .background(GlassCardBackground())
+        .overlay { GlassCardBorder() }
+        .accessibilityLabel("Importar arquivo .3105")
     }
 
     private var emptyContent: some View {
