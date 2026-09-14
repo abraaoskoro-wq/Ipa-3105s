@@ -11,7 +11,14 @@ struct RepositoryHomeView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
+            ZStack {
+                Image("HomeBackground")
+                    .resizable()
+                    .scaledToFill()
+                    .overlay(Color.black.opacity(0.18))
+                    .ignoresSafeArea()
+
+                ScrollView {
                 LazyVStack(alignment: .leading, spacing: 28) {
                     if feed.isEmpty {
                         emptyContent
@@ -26,8 +33,8 @@ struct RepositoryHomeView: View {
                 .padding(.horizontal, AppTheme.contentCardInset)
                 .padding(.top, 16)
                 .padding(.bottom, 32)
+                }
             }
-            .background(Color(uiColor: .systemGroupedBackground))
             .refreshable {
                 await store.refreshAllAndWait()
                 rebuildFeed()
