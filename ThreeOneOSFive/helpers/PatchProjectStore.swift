@@ -305,14 +305,13 @@ final class PatchProjectStore: ObservableObject {
                     _ = try DevicePatchService.apply(project: project)
                     await self?.finishOperation(successMessageKey: "patch.applied_message")
                 } else if let receipt = DevicePatchService.latestReceipt(projectID: item.id) {
-                    let inspection = try DevicePatchService.inspectRestore(receipt: receipt)
-                    guard inspection.changedTargets.isEmpty else {
-                        await self?.failOperation(
-                            .restoreTargetsChanged(inspection.changedTargets.map(\.displayPath))
-                        )
-                        return
-                    }
-                    try DevicePatchService.restore(receipt: receipt)
+                    // The switch is the explicit user command to deactivate and
+                    // restore the pre-patch state, even if the target changed
+                    // while the patch was active.
+                    try DevicePatchService.restore(
+                        receipt: receipt,
+                        allowChangedTargets: true
+                    )
                     await self?.finishOperation(successMessageKey: "patch.restored_message")
                 } else {
                     await self?.finishOperation(successMessageKey: "patch.restored_message")
