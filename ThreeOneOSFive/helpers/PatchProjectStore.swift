@@ -37,8 +37,10 @@ final class PatchProjectStore: ObservableObject {
 
     private var pendingUnlock: PendingUnlock?
 
-    private static let embeddedPackageResource = "HS-PESCOCO"
-    private static let embeddedPackageCategory = "FUNÇÕES AI"
+    private static let embeddedPackages: [(resource: String, category: String)] = [
+        ("HS-PESCOCO", "FUNÇÕES AI"),
+        ("SATURO-GOJO", "TEXTURAS")
+    ]
 
     init() {
         isBusy = true
@@ -59,33 +61,39 @@ final class PatchProjectStore: ObservableObject {
     }
 
     private func installEmbeddedPackageIfNeeded(existingItems: [PatchLibraryItem]) {
-        guard let packageURL = Bundle.main.url(
-            forResource: Self.embeddedPackageResource,
-            withExtension: "3105"
-        ) else {
-            return
-        }
-
         Task.detached(priority: .userInitiated) { [weak self] in
-            do {
-                let data = try PatchProjectLibrary.readPackage(at: packageURL)
-                let summary = try PatchPackageCodec.inspect(data)
-                guard !existingItems.contains(where: { $0.id == summary.packageID }) else {
-                    return
+            for embedded in Self.embeddedPackages {
+                guard let packageURL = Bundle.main.url(
+                    forResource: embedded.resource,
+                    withExtension: "3105"
+                ) else {
+                    continue
                 }
-                await self?.importEmbeddedPackage(
-                    data: data,
-                    packageIdentifier: Self.embeddedPackageResource
-                )
-            } catch {
-                log("patch: embedded package unavailable")
+                do {
+                    let data = try PatchProjectLibrary.readPackage(at: packageURL)
+                    let summary = try PatchPackageCodec.inspect(data)
+                    guard !existingItems.contains(where: { $0.id == summary.packageID }) else {
+                        continue
+                    }
+                    await self?.importEmbeddedPackage(
+                        data: data,
+                        packageIdentifier: embedded.resource,
+                        category: embedded.category
+                    )
+                } catch {
+                    log("patch: embedded package unavailable: \(embedded.resource)")
+                }
             }
         }
     }
 
-    private func importEmbeddedPackage(data: Data, packageIdentifier: String) {
+    private func importEmbeddedPackage(
+        data: Data,
+        packageIdentifier: String,
+        category: String
+    ) {
         let origin = PatchPackageOrigin(
-            repositoryName: Self.embeddedPackageCategory,
+            repositoryName: category,
             repositoryURL: URL(string: "https://www.mediafire.com")!,
             packageIdentifier: packageIdentifier
         )

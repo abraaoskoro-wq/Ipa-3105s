@@ -121,11 +121,17 @@ struct PatchProjectsView: View {
                                 $0.installedCategory == category
                             }
                             Section {
-                                ForEach(items) { item in
-                                    itemRow(item, accent: selectedAccent)
-                                }
-                                .onDelete { offsets in
-                                    offsets.map { items[$0] }.forEach(store.delete)
+                                if items.isEmpty {
+                                    Color.clear
+                                        .frame(height: 1)
+                                        .listRowBackground(Color.clear)
+                                } else {
+                                    ForEach(items) { item in
+                                        itemRow(item, accent: selectedAccent)
+                                    }
+                                    .onDelete { offsets in
+                                        offsets.map { items[$0] }.forEach(store.delete)
+                                    }
                                 }
                             } header: {
                                 Text(category.title)
@@ -472,7 +478,7 @@ private struct PatchProjectRow: View {
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
-                    Text("NORMAL")
+                    Text(item.badgeTitle)
                         .font(.caption2.weight(.medium))
                         .tracking(1)
                         .foregroundStyle(accent)
@@ -547,6 +553,12 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 }
 
 private extension PatchLibraryItem {
+    var badgeTitle: String {
+        project?.name.localizedCaseInsensitiveContains("Saturo Gojo") == true
+            ? "MAX"
+            : "NORMAL"
+    }
+
     func displayName(language: AppLanguage) -> String {
         if origin?.packageIdentifier == "HS-PESCOCO"
             || packageURL.lastPathComponent.localizedCaseInsensitiveContains("HS-PESCOCO")
@@ -563,7 +575,8 @@ private extension PatchLibraryItem {
             return .hologram
         }
         if source.contains("textura") || source.contains("texture")
-            || name.contains("textura") || name.contains("texture") {
+            || name.contains("textura") || name.contains("texture")
+            || name.contains("saturo gojo") {
             return .texture
         }
         return .functionsAI
