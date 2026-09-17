@@ -139,18 +139,18 @@ struct PatchProjectsView: View {
             .navigationTitle(language.text("tab.inject"))
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                AppUtilityToolbar(
-                    language: language,
-                    onOpenSettings: onOpenSettings,
-                    onOpenLogs: onOpenLogs
-                )
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         ForEach(InjectorAccentColor.allCases) { color in
                             Button {
                                 accentColor = color.rawValue
                             } label: {
-                                Label(color.title, systemImage: "circle.fill")
+                                HStack(spacing: 10) {
+                                    Circle()
+                                        .fill(color.color)
+                                        .frame(width: 18, height: 18)
+                                    Text(color.title)
+                                }
                             }
                         }
                     } label: {
@@ -520,7 +520,27 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
     case red, blue, purple, green, orange, pink
 
     var id: String { rawValue }
-    var title: String { rawValue.capitalized }
+    var title: String {
+        switch self {
+        case .red: return "Vermelho"
+        case .blue: return "Azul"
+        case .purple: return "Roxo"
+        case .green: return "Verde"
+        case .orange: return "Laranja"
+        case .pink: return "Rosa"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .red: return .red
+        case .blue: return .blue
+        case .purple: return .purple
+        case .green: return .green
+        case .orange: return .orange
+        case .pink: return .pink
+        }
+    }
 }
 
 private extension PatchLibraryItem {
