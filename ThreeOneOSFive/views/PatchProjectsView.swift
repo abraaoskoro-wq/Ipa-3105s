@@ -23,6 +23,7 @@ struct PatchProjectsView: View {
     @State private var showWallpaperImporter = false
     @State private var showCleaner = false
     @State private var searchText = ""
+    @AppStorage("app.accentColor") private var accentColor = "red"
     @State private var wallpaperPackages: [WallpaperStagedPackage] = []
     @State private var wallpaperImportFeedback: WallpaperImportFeedback?
     @State private var wallpaperPendingDeletion: WallpaperStagedPackage?
@@ -143,6 +144,21 @@ struct PatchProjectsView: View {
                     onOpenSettings: onOpenSettings,
                     onOpenLogs: onOpenLogs
                 )
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Menu {
+                        ForEach(InjectorAccentColor.allCases) { color in
+                            Button {
+                                accentColor = color.rawValue
+                            } label: {
+                                Label(color.title, systemImage: "circle.fill")
+                            }
+                        }
+                    } label: {
+                        Image(systemName: "paintpalette.fill")
+                            .foregroundStyle(AppTheme.accent)
+                    }
+                    .accessibilityLabel("Escolher cor")
+                }
             }
             .sheet(isPresented: $showImporter) {
                 FileDocumentPicker(
@@ -448,10 +464,11 @@ private struct PatchProjectRow: View {
             )
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
-                    Text(item.project?.name ?? language.text("patch.locked_project"))
+                    Text(item.displayName(language: language))
                         .font(.body.weight(.semibold))
                         .foregroundStyle(.primary)
-                        .lineLimit(1)
+                        .lineLimit(2)
+                        .minimumScaleFactor(0.82)
                     Text("NORMAL")
                         .font(.caption2.weight(.medium))
                         .tracking(1)
@@ -462,7 +479,11 @@ private struct PatchProjectRow: View {
                 }
                 HStack(spacing: 6) {
                     Image(systemName: "questionmark.circle")
-                    Text(item.project == nil ? "Bloqueado" : "Estado não verificado")
+                    Text(item.project == nil
+                        ? "Bloqueado"
+                        : (DevicePatchService.latestReceipt(projectID: item.id) != nil
+                            ? "Arquivo ativado"
+                            : "Arquivo desativado"))
                 }
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
@@ -495,7 +516,23 @@ private enum InstalledPatchCategory: String, CaseIterable, Identifiable {
     var title: String { rawValue }
 }
 
+private enum InjectorAccentColor: String, CaseIterable, Identifiable {
+    case red, blue, purple, green, orange, pink
+
+    var id: String { rawValue }
+    var title: String { rawValue.capitalized }
+}
+
 private extension PatchLibraryItem {
+    func displayName(language: AppLanguage) -> String {
+        if origin?.packageIdentifier == "HS-PESCOCO"
+            || packageURL.lastPathComponent.localizedCaseInsensitiveContains("HS-PESCOCO")
+            || project?.name.localizedCaseInsensitiveContains("HS PESCO") == true {
+            return "HS PESCOÇO"
+        }
+        return project?.name ?? language.text("patch.locked_project")
+    }
+
     var installedCategory: InstalledPatchCategory {
         let source = origin?.repositoryName.localizedLowercase ?? ""
         let name = project?.name.localizedLowercase ?? packageURL.lastPathComponent.localizedLowercase

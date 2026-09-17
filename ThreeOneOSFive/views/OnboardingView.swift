@@ -41,29 +41,7 @@ struct OnboardingView: View {
     }
 
     private var header: some View {
-        VStack(spacing: 10) {
-            HStack(spacing: 6) {
-                ForEach(OnboardingStep.allCases, id: \.rawValue) { s in
-                    Capsule()
-                        .fill(s.rawValue <= step.rawValue ? AppTheme.accent : Color.secondary.opacity(0.22))
-                        .frame(height: 4)
-                        .frame(maxWidth: s == step ? 28 : 18)
-                        .animation(motionAnimation, value: step)
-                        .accessibilityHidden(true)
-                }
-            }
-            .frame(maxWidth: 560)
-            .padding(.horizontal, 20)
-
-            Text(language.text("onboarding.step", "\(step.rawValue + 1)", "\(OnboardingStep.allCases.count)"))
-                .font(.caption.weight(.medium))
-                .foregroundStyle(.secondary)
-                .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
-        }
-        .padding(.top, 16)
-        .padding(.bottom, 8)
-        .frame(maxWidth: .infinity)
-        .background(AppTheme.pageBackground)
+        Color.clear.frame(height: 12)
     }
 
     @ViewBuilder
@@ -402,19 +380,10 @@ struct OnboardingView: View {
         }
 
         Button {
-            if let nextStep = step.next {
-                navigate(to: nextStep, direction: .forward)
-            } else {
-                onComplete()
-            }
+            onComplete()
         } label: {
             HStack(spacing: 6) {
-                Text(language.text(step == .install ? "common.finish" : "common.next"))
-                if step != .install {
-                    Image(systemName: "chevron.right")
-                        .font(.caption.weight(.semibold))
-                        .accessibilityHidden(true)
-                }
+                Text(language.text("common.finish"))
             }
             .frame(maxWidth: .infinity)
         }
