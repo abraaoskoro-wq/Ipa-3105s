@@ -75,6 +75,10 @@ struct PatchProjectsView: View {
         !filteredItems.isEmpty || !filteredWallpaperPackages.isEmpty
     }
 
+    private var selectedAccent: Color {
+        InjectorAccentColor(rawValue: accentColor)?.color ?? AppTheme.accent
+    }
+
     init(
         onOpenSettings: @escaping () -> Void = {},
         onOpenLogs: @escaping () -> Void = {}
@@ -116,20 +120,18 @@ struct PatchProjectsView: View {
                             let items = filteredItems.filter {
                                 $0.installedCategory == category
                             }
-                            if !items.isEmpty {
-                                Section {
-                                    ForEach(items) { item in
-                                        itemRow(item)
-                                    }
-                                    .onDelete { offsets in
-                                        offsets.map { items[$0] }.forEach(store.delete)
-                                    }
-                                } header: {
-                                    Text(category.title)
-                                        .font(.caption.weight(.bold))
-                                        .tracking(2.2)
-                                        .foregroundStyle(.secondary)
+                            Section {
+                                ForEach(items) { item in
+                                    itemRow(item, accent: selectedAccent)
                                 }
+                                .onDelete { offsets in
+                                    offsets.map { items[$0] }.forEach(store.delete)
+                                }
+                            } header: {
+                                Text(category.title)
+                                    .font(.caption.weight(.bold))
+                                    .tracking(2.2)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -155,7 +157,7 @@ struct PatchProjectsView: View {
                         }
                     } label: {
                         Image(systemName: "paintpalette.fill")
-                            .foregroundStyle(AppTheme.accent)
+                            .foregroundStyle(selectedAccent)
                     }
                     .accessibilityLabel("Escolher cor")
                 }
@@ -387,11 +389,11 @@ struct PatchProjectsView: View {
     }
 
     @ViewBuilder
-    private func itemRow(_ item: PatchLibraryItem) -> some View {
+    private func itemRow(_ item: PatchLibraryItem, accent: Color) -> some View {
         Button {
             if item.isLocked { store.requestUnlock(for: item) }
         } label: {
-            PatchProjectRow(item: item, language: language, store: store)
+            PatchProjectRow(item: item, language: language, store: store, accent: accent)
         }
         .buttonStyle(.plain)
     }
@@ -453,12 +455,13 @@ private struct PatchProjectRow: View {
     let item: PatchLibraryItem
     let language: AppLanguage
     @ObservedObject var store: PatchProjectStore
+    let accent: Color
 
     var body: some View {
         HStack(spacing: 12) {
             AppRowIcon(
                 systemName: item.isLocked ? "lock.doc.fill" : item.installedIcon,
-                tint: AppTheme.accent,
+                tint: accent,
                 symbolSize: 18,
                 frameSize: 42
             )
@@ -472,7 +475,7 @@ private struct PatchProjectRow: View {
                     Text("NORMAL")
                         .font(.caption2.weight(.medium))
                         .tracking(1)
-                        .foregroundStyle(.secondary)
+                        .foregroundStyle(accent)
                         .padding(.horizontal, 7)
                         .padding(.vertical, 3)
                         .background(Color.secondary.opacity(0.13), in: Capsule())
@@ -498,7 +501,7 @@ private struct PatchProjectRow: View {
                     )
                 )
                 .labelsHidden()
-                .tint(AppTheme.accent)
+                .tint(accent)
                 .disabled(store.isBusy)
             }
         }
