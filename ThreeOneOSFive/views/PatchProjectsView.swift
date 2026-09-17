@@ -23,7 +23,6 @@ struct PatchProjectsView: View {
     @State private var showWallpaperImporter = false
     @State private var showCleaner = false
     @State private var searchText = ""
-    @State private var selectedCategory = InstalledPatchCategory.functionsAI
     @State private var wallpaperPackages: [WallpaperStagedPackage] = []
     @State private var wallpaperImportFeedback: WallpaperImportFeedback?
     @State private var wallpaperPendingDeletion: WallpaperStagedPackage?
@@ -75,10 +74,6 @@ struct PatchProjectsView: View {
         !filteredItems.isEmpty || !filteredWallpaperPackages.isEmpty
     }
 
-    private var categorizedItems: [PatchLibraryItem] {
-        filteredItems.filter { $0.installedCategory == selectedCategory }
-    }
-
     init(
         onOpenSettings: @escaping () -> Void = {},
         onOpenLogs: @escaping () -> Void = {}
@@ -108,7 +103,6 @@ struct PatchProjectsView: View {
                 .padding(.horizontal, AppTheme.pageInset)
                 .padding(.top, 14)
                 .padding(.bottom, 8)
-                categoryBar
                 List {
                     if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
                         loadingState
@@ -117,20 +111,24 @@ struct PatchProjectsView: View {
                         emptyState
                             .listRowSeparator(.hidden)
                     } else {
-                        if !categorizedItems.isEmpty {
-                            Section(selectedCategory.title) {
-                                ForEach(categorizedItems) { item in
-                                    itemRow(item)
-                                }
-                                .onDelete { offsets in
-                                    offsets.map { categorizedItems[$0] }.forEach(store.delete)
-                                }
+                        ForEach(InstalledPatchCategory.allCases) { category in
+                            let items = filteredItems.filter {
+                                $0.installedCategory == category
                             }
-                        } else {
-                            Section(selectedCategory.title) {
-                                Text("Nenhum arquivo nesta categoria")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
+                            if !items.isEmpty {
+                                Section {
+                                    ForEach(items) { item in
+                                        itemRow(item)
+                                    }
+                                    .onDelete { offsets in
+                                        offsets.map { items[$0] }.forEach(store.delete)
+                                    }
+                                } header: {
+                                    Text(category.title)
+                                        .font(.caption.weight(.bold))
+                                        .tracking(2.2)
+                                        .foregroundStyle(.secondary)
+                                }
                             }
                         }
                     }
@@ -382,35 +380,6 @@ struct PatchProjectsView: View {
         .buttonStyle(.plain)
     }
 
-    private var categoryBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 10) {
-                ForEach(InstalledPatchCategory.allCases) { category in
-                    Button {
-                        selectedCategory = category
-                    } label: {
-                        Text(category.title)
-                            .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(
-                                selectedCategory == category ? .white : .secondary
-                            )
-                            .padding(.horizontal, 15)
-                            .padding(.vertical, 9)
-                            .background(
-                                selectedCategory == category
-                                    ? AppTheme.accent
-                                    : Color.secondary.opacity(0.12),
-                                in: Capsule()
-                            )
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(.horizontal, AppTheme.pageInset)
-            .padding(.bottom, 8)
-        }
-    }
-
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "shippingbox")
@@ -471,17 +440,34 @@ private struct PatchProjectRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            AppRowIcon(systemName: item.isLocked ? "lock.doc.fill" : "shippingbox.fill")
-            VStack(alignment: .leading, spacing: 3) {
-                Text(item.project?.name ?? language.text("patch.locked_project"))
-                    .font(.body.weight(.semibold))
-                    .foregroundStyle(.primary)
-                    .lineLimit(1)
-                Text(item.project == nil ? "Bloqueado" : "Patch")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+            AppRowIcon(
+                systemName: item.isLocked ? "lock.doc.fill" : item.installedIcon,
+                tint: AppTheme.accent,
+                symbolSize: 18,
+                frameSize: 42
+            )
+            VStack(alignment: .leading, spacing: 4) {
+                HStack(spacing: 8) {
+                    Text(item.project?.name ?? language.text("patch.locked_project"))
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(.primary)
+                        .lineLimit(1)
+                    Text("NORMAL")
+                        .font(.caption2.weight(.medium))
+                        .tracking(1)
+                        .foregroundStyle(.secondary)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 3)
+                        .background(Color.secondary.opacity(0.13), in: Capsule())
+                }
+                HStack(spacing: 6) {
+                    Image(systemName: "questionmark.circle")
+                    Text(item.project == nil ? "Bloqueado" : "Estado não verificado")
+                }
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
             }
-            Spacer()
+            Spacer(minLength: 8)
             if item.project != nil {
                 Toggle(
                     "",
@@ -495,15 +481,15 @@ private struct PatchProjectRow: View {
                 .disabled(store.isBusy)
             }
         }
-        .padding(.vertical, 4)
+        .padding(.vertical, 8)
     }
 
 }
 
 private enum InstalledPatchCategory: String, CaseIterable, Identifiable {
-    case functionsAI = "FUNÇÕES AI"
-    case hologram = "Holograma"
-    case texture = "Textura"
+    case functionsAI = "FUNÇÕES DE AIM"
+    case hologram = "FUNÇÕES HOLOGRAMA"
+    case texture = "TEXTURAS"
 
     var id: String { rawValue }
     var title: String { rawValue }
@@ -521,6 +507,14 @@ private extension PatchLibraryItem {
             return .texture
         }
         return .functionsAI
+    }
+
+    var installedIcon: String {
+        switch installedCategory {
+        case .functionsAI: return "scope"
+        case .hologram: return "cube"
+        case .texture: return "person.crop.square"
+        }
     }
 }
 
