@@ -373,8 +373,8 @@ final class PackageRepositoryStore: ObservableObject {
                 version: "1.2.0",
                 summary: "A compact layout patch for a cleaner app interface.",
                 details: "Simulator preview package used to verify marketplace layout.",
-                category: "Customization",
-                tags: ["Customization", "Layout", "Featured"],
+                category: "FUNÇÕES AIM",
+                tags: ["FUNÇÕES AIM", "Layout", "Featured"],
                 publishedAt: ISO8601DateFormatter().date(
                     from: "2026-08-21T08:00:00Z"
                 ),

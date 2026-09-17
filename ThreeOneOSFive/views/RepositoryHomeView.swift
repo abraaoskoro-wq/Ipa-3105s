@@ -1,19 +1,8 @@
 import SwiftUI
-import UniformTypeIdentifiers
-
-private enum HomePatchPickerPolicy {
-    static let allowedContentTypes: [UTType] = [
-        UTType(filenameExtension: "3105") ?? .data,
-        .data
-    ]
-}
-
 struct RepositoryHomeView: View {
     @Environment(\.appLanguage) private var language
     @EnvironmentObject private var appState: AppState
     @EnvironmentObject private var store: PackageRepositoryStore
-    @EnvironmentObject private var patchStore: PatchProjectStore
-    @State private var showPatchImporter = false
 
     let onOpenSettings: () -> Void
     let onOpenLogs: () -> Void
@@ -57,23 +46,6 @@ struct RepositoryHomeView: View {
             .onAppear {
                 store.refreshAllIfNeeded()
                 appState.detectSupport()
-            }
-            .sheet(isPresented: $showPatchImporter) {
-                FileDocumentPicker(
-                    allowedContentTypes: HomePatchPickerPolicy.allowedContentTypes,
-                    copiesSelectedDocument: true,
-                    allowsMultipleSelection: false,
-                    onSelection: { result in
-                        showPatchImporter = false
-                        guard case .success(let urls) = result,
-                              let url = urls.first else { return }
-                        patchStore.importPackage(at: url)
-                    },
-                    onCancel: {
-                        showPatchImporter = false
-                    }
-                )
-                .ignoresSafeArea()
             }
         }
     }
@@ -122,24 +94,6 @@ struct RepositoryHomeView: View {
             Text("Acesso rápido")
                 .font(.title2.weight(.bold))
                 .foregroundStyle(.white)
-
-            Button { showPatchImporter = true } label: {
-                HStack(spacing: 14) {
-                    AppRowIcon(systemName: "square.and.arrow.down", tint: AppTheme.accent, symbolSize: 18, frameSize: 40)
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Importar arquivo .3105").font(.headline).foregroundStyle(.white)
-                        Text("Adicione um pacote pelo app Arquivos").font(.subheadline).foregroundStyle(.white.opacity(0.72))
-                    }
-                    Spacer(minLength: 8)
-                    Image(systemName: "chevron.right").foregroundStyle(AppTheme.accent)
-                }
-                .padding(AppTheme.contentCardPadding)
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .background(GlassCardBackground())
-            .overlay { GlassCardBorder() }
 
             Button(action: onOpenInject) {
                 VStack(alignment: .leading, spacing: 4) {
