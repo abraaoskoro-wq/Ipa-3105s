@@ -23,6 +23,7 @@ struct PatchProjectsView: View {
     @State private var showWallpaperImporter = false
     @State private var showCleaner = false
     @State private var searchText = ""
+    @State private var selectedCategory = InstalledPatchCategory.functionsAI
     @State private var wallpaperPackages: [WallpaperStagedPackage] = []
     @State private var wallpaperImportFeedback: WallpaperImportFeedback?
     @State private var wallpaperPendingDeletion: WallpaperStagedPackage?
@@ -74,6 +75,10 @@ struct PatchProjectsView: View {
         !filteredItems.isEmpty || !filteredWallpaperPackages.isEmpty
     }
 
+    private var categorizedItems: [PatchLibraryItem] {
+        filteredItems.filter { $0.installedCategory == selectedCategory }
+    }
+
     init(
         onOpenSettings: @escaping () -> Void = {},
         onOpenLogs: @escaping () -> Void = {}
@@ -103,6 +108,7 @@ struct PatchProjectsView: View {
                 .padding(.horizontal, AppTheme.pageInset)
                 .padding(.top, 14)
                 .padding(.bottom, 8)
+                categoryBar
                 List {
                     if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
                         loadingState
@@ -111,14 +117,20 @@ struct PatchProjectsView: View {
                         emptyState
                             .listRowSeparator(.hidden)
                     } else {
-                        if !filteredItems.isEmpty {
-                            Section(language.text("patch.title")) {
-                                ForEach(filteredItems) { item in
+                        if !categorizedItems.isEmpty {
+                            Section(selectedCategory.title) {
+                                ForEach(categorizedItems) { item in
                                     itemRow(item)
                                 }
                                 .onDelete { offsets in
-                                    offsets.map { filteredItems[$0] }.forEach(store.delete)
+                                    offsets.map { categorizedItems[$0] }.forEach(store.delete)
                                 }
+                            }
+                        } else {
+                            Section(selectedCategory.title) {
+                                Text("Nenhum arquivo nesta categoria")
+                                    .font(.subheadline)
+                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
@@ -370,6 +382,35 @@ struct PatchProjectsView: View {
         .buttonStyle(.plain)
     }
 
+    private var categoryBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 10) {
+                ForEach(InstalledPatchCategory.allCases) { category in
+                    Button {
+                        selectedCategory = category
+                    } label: {
+                        Text(category.title)
+                            .font(.subheadline.weight(.semibold))
+                            .foregroundStyle(
+                                selectedCategory == category ? .white : .secondary
+                            )
+                            .padding(.horizontal, 15)
+                            .padding(.vertical, 9)
+                            .background(
+                                selectedCategory == category
+                                    ? AppTheme.accent
+                                    : Color.secondary.opacity(0.12),
+                                in: Capsule()
+                            )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            .padding(.horizontal, AppTheme.pageInset)
+            .padding(.bottom, 8)
+        }
+    }
+
     private var emptyState: some View {
         VStack(spacing: 12) {
             Image(systemName: "shippingbox")
@@ -457,6 +498,30 @@ private struct PatchProjectRow: View {
         .padding(.vertical, 4)
     }
 
+}
+
+private enum InstalledPatchCategory: String, CaseIterable, Identifiable {
+    case functionsAI = "FUNÇÕES AI"
+    case hologram = "Holograma"
+    case texture = "Textura"
+
+    var id: String { rawValue }
+    var title: String { rawValue }
+}
+
+private extension PatchLibraryItem {
+    var installedCategory: InstalledPatchCategory {
+        let source = origin?.repositoryName.localizedLowercase ?? ""
+        let name = project?.name.localizedLowercase ?? packageURL.lastPathComponent.localizedLowercase
+        if source.contains("holograma") || name.contains("holograma") {
+            return .hologram
+        }
+        if source.contains("textura") || source.contains("texture")
+            || name.contains("textura") || name.contains("texture") {
+            return .texture
+        }
+        return .functionsAI
+    }
 }
 
 private enum InstalledContentKind {

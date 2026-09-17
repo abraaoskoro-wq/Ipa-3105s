@@ -38,7 +38,7 @@ final class PatchProjectStore: ObservableObject {
     private var pendingUnlock: PendingUnlock?
 
     private static let embeddedPackageResource = "HS-PESCOCO"
-    private static let embeddedPackageCategory = "FUNÇÕES AIM"
+    private static let embeddedPackageCategory = "FUNÇÕES AI"
 
     init() {
         isBusy = true
@@ -89,7 +89,7 @@ final class PatchProjectStore: ObservableObject {
             repositoryURL: URL(string: "https://www.mediafire.com")!,
             packageIdentifier: packageIdentifier
         )
-        _ = importPackage(data: data, origin: origin)
+        _ = importPackage(data: data, origin: origin, reportsSuccess: false)
     }
 
     func create(project: PatchProject, password: String?) {
@@ -173,7 +173,8 @@ final class PatchProjectStore: ObservableObject {
     func importPackage(
         data: Data,
         password: String? = nil,
-        origin: PatchPackageOrigin? = nil
+        origin: PatchPackageOrigin? = nil,
+        reportsSuccess: Bool = true
     ) -> Bool {
         guard !isBusy else { return false }
         isBusy = true
@@ -190,7 +191,10 @@ final class PatchProjectStore: ObservableObject {
                 ) {
                     await self?.requestPassword(pending: pending)
                 } else {
-                    await self?.finishOperation(successMessageKey: "patch.imported_message")
+                    await self?.finishOperation(
+                        successMessageKey: "patch.imported_message",
+                        reportsSuccess: reportsSuccess
+                    )
                 }
             } catch let error as PatchPackageError {
                 await self?.failOperation(error)
@@ -481,10 +485,15 @@ final class PatchProjectStore: ObservableObject {
         unlockErrorKey = nil
     }
 
-    private func finishOperation(successMessageKey: String) {
+    private func finishOperation(
+        successMessageKey: String,
+        reportsSuccess: Bool = true
+    ) {
         reload()
         isBusy = false
-        alert = PatchStoreAlert(titleKey: "common.done", messageKey: successMessageKey)
+        if reportsSuccess {
+            alert = PatchStoreAlert(titleKey: "common.done", messageKey: successMessageKey)
+        }
     }
 
     private func failOperation(_ error: PatchPackageError) {
