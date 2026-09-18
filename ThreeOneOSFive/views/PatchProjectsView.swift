@@ -24,6 +24,7 @@ struct PatchProjectsView: View {
     @State private var showCleaner = false
     @State private var searchText = ""
     @AppStorage("app.accentColor") private var accentColor = "red"
+    @State private var selectedGame: InjectorGame = .freeFire
     @State private var wallpaperPackages: [WallpaperStagedPackage] = []
     @State private var wallpaperImportFeedback: WallpaperImportFeedback?
     @State private var wallpaperPendingDeletion: WallpaperStagedPackage?
@@ -94,55 +95,30 @@ struct PatchProjectsView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text(language.text("inject.resources"))
-                        .font(.caption.weight(.bold))
-                        .tracking(3)
-                        .foregroundStyle(AppTheme.accent)
-                    Text(language.text("inject.subtitle"))
-                        .font(.title2.weight(.bold))
-                        .foregroundStyle(.primary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.horizontal, AppTheme.pageInset)
-                .padding(.top, 14)
-                .padding(.bottom, 8)
-                List {
-                    if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
-                        loadingState
-                            .listRowSeparator(.hidden)
-                    } else if !hasLocalContent {
-                        emptyState
-                            .listRowSeparator(.hidden)
-                    } else {
-                        ForEach(InstalledPatchCategory.allCases) { category in
-                            let items = filteredItems.filter {
-                                $0.installedCategory == category
-                            }
-                            Section {
-                                if items.isEmpty {
-                                    Color.clear
-                                        .frame(height: 1)
-                                        .listRowBackground(Color.clear)
-                                } else {
-                                    ForEach(items) { item in
-                                        itemRow(item, accent: selectedAccent)
-                                    }
-                                    .onDelete { offsets in
-                                        offsets.map { items[$0] }.forEach(store.delete)
-                                    }
+            ZStack {
+                InjectorBackground(accent: selectedAccent)
+                ScrollView(showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 20) {
+                        gameSelector
+                        performanceHeader
+                        if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
+                            loadingState
+                        } else if !hasLocalContent {
+                            emptyState
+                        } else if filteredItems.isEmpty {
+                            searchEmptyState
+                        } else {
+                            LazyVStack(spacing: 14) {
+                                ForEach(filteredItems) { item in
+                                    itemRow(item, accent: selectedAccent)
                                 }
-                            } header: {
-                                Text(category.title)
-                                    .font(.caption.weight(.bold))
-                                    .tracking(2.2)
-                                    .foregroundStyle(.secondary)
                             }
                         }
                     }
+                    .padding(.horizontal, 18)
+                    .padding(.top, 10)
+                    .padding(.bottom, 32)
                 }
-                .listStyle(.insetGrouped)
             }
             .navigationTitle(language.text("tab.inject"))
             .navigationBarTitleDisplayMode(.inline)
@@ -270,6 +246,58 @@ struct PatchProjectsView: View {
             .onChange(of: draftCoordinator.importRequest?.id) { _ in
                 consumeExternalImport()
             }
+        }
+    }
+
+    private var gameSelector: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("FUNÇÕES EXTERNAL")
+                .font(.title3.weight(.bold))
+                .foregroundStyle(.primary)
+                .frame(maxWidth: .infinity, alignment: .center)
+
+            HStack(spacing: 14) {
+                ForEach(InjectorGame.allCases) { game in
+                    Button {
+                        selectedGame = game
+                    } label: {
+                        VStack(alignment: .leading, spacing: 12) {
+                            Image(systemName: "gamecontroller.fill")
+                                .font(.title3)
+                            Text(game.title)
+                                .font(.title3.weight(.bold))
+                            Text(selectedGame == game ? "Selecionado" : "Toque para selecionar")
+                                .font(.body.weight(.medium))
+                                .foregroundStyle(selectedGame == game ? .white : .secondary)
+                        }
+                        .foregroundStyle(selectedGame == game ? .white : .primary)
+                        .frame(maxWidth: .infinity, minHeight: 172, alignment: .leading)
+                        .padding(18)
+                        .background(
+                            RoundedRectangle(cornerRadius: 28, style: .continuous)
+                                .fill(selectedGame == game ? selectedAccent : Color(uiColor: .secondarySystemBackground))
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+    }
+
+    private var performanceHeader: some View {
+        HStack(alignment: .bottom) {
+            VStack(alignment: .leading, spacing: 5) {
+                Text("PRECISÃO & DESEMPENHO")
+                    .font(.title2.weight(.heavy))
+                Text("Recursos de precisão e desempenho")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+            }
+            Spacer()
+            Text("\(filteredItems.count) FUNÇÕES")
+                .font(.subheadline.weight(.bold))
+                .foregroundStyle(selectedAccent)
+                .multilineTextAlignment(.trailing)
         }
     }
 
@@ -464,38 +492,30 @@ private struct PatchProjectRow: View {
     let accent: Color
 
     var body: some View {
-        HStack(spacing: 12) {
-            AppRowIcon(
-                systemName: item.isLocked ? "lock.doc.fill" : item.installedIcon,
-                tint: accent,
-                symbolSize: 18,
-                frameSize: 42
-            )
+        HStack(spacing: 14) {
+            ZStack {
+                Circle()
+                    .fill(accent.opacity(0.13))
+                    .overlay(Circle().stroke(accent.opacity(0.72), lineWidth: 1))
+                Image(systemName: item.isLocked ? "lock.doc.fill" : item.installedIcon)
+                    .font(.system(size: 20, weight: .semibold))
+                    .foregroundStyle(accent)
+            }
+            .frame(width: 52, height: 52)
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 8) {
                     Text(item.displayName(language: language))
-                        .font(.body.weight(.semibold))
+                        .font(.title3.weight(.heavy))
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
-                    Text(item.badgeTitle)
-                        .font(.caption2.weight(.medium))
-                        .tracking(1)
-                        .foregroundStyle(accent)
-                        .padding(.horizontal, 7)
-                        .padding(.vertical, 3)
-                        .background(Color.secondary.opacity(0.13), in: Capsule())
                 }
-                HStack(spacing: 6) {
-                    Image(systemName: "questionmark.circle")
-                    Text(item.project == nil
-                        ? "Bloqueado"
-                        : (DevicePatchService.latestReceipt(projectID: item.id) != nil
-                            ? "Arquivo ativado"
-                            : "Arquivo desativado"))
-                }
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
+                Text(item.project == nil
+                    ? "Recurso indisponível"
+                    : "Recurso pré-carregado do Free Fire.")
+                    .font(.body)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
             }
             Spacer(minLength: 8)
             if item.project != nil {
@@ -511,9 +531,53 @@ private struct PatchProjectRow: View {
                 .disabled(store.isBusy)
             }
         }
-        .padding(.vertical, 8)
+        .padding(.horizontal, 18)
+        .padding(.vertical, 20)
+        .background(
+            RoundedRectangle(cornerRadius: 26, style: .continuous)
+                .fill(Color(uiColor: .secondarySystemBackground).opacity(0.78))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 26, style: .continuous)
+                        .stroke(accent.opacity(0.24), lineWidth: 1)
+                )
+        )
     }
 
+}
+
+private enum InjectorGame: String, CaseIterable, Identifiable {
+    case freeFire, freeFireMax
+
+    var id: String { rawValue }
+    var title: String {
+        switch self {
+        case .freeFire: return "FREE FIRE"
+        case .freeFireMax: return "FREE FIRE MAX"
+        }
+    }
+}
+
+private struct InjectorBackground: View {
+    let accent: Color
+
+    var body: some View {
+        ZStack {
+            Color.black
+            RadialGradient(
+                colors: [accent.opacity(0.20), .clear],
+                center: .topLeading,
+                startRadius: 20,
+                endRadius: 520
+            )
+            RadialGradient(
+                colors: [accent.opacity(0.10), .clear],
+                center: .bottomTrailing,
+                startRadius: 10,
+                endRadius: 460
+            )
+        }
+        .ignoresSafeArea()
+    }
 }
 
 private enum InstalledPatchCategory: String, CaseIterable, Identifiable {
