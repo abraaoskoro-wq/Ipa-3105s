@@ -603,55 +603,63 @@ private struct InjectorParticleField: View {
     ]
 
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
-            Canvas { context, size in
-                let time = timeline.date.timeIntervalSinceReferenceDate
-                let points = anchors.map { anchor in
-                    CGPoint(
-                        x: size.width * anchor.x + CGFloat(sin(time * 0.45 + anchor.phase) * 7),
-                        y: size.height * anchor.y + CGFloat(cos(time * 0.38 + anchor.phase) * 11)
+        GeometryReader { proxy in
+            TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+                Canvas { context, size in
+                    let canvasSize = CGSize(
+                        width: max(size.width, proxy.size.width),
+                        height: max(size.height, proxy.size.height)
                     )
-                }
+                    let time = timeline.date.timeIntervalSinceReferenceDate
+                    let points = anchors.map { anchor in
+                        CGPoint(
+                            x: canvasSize.width * anchor.x + CGFloat(sin(time * 0.45 + anchor.phase) * 7),
+                            y: canvasSize.height * anchor.y + CGFloat(cos(time * 0.38 + anchor.phase) * 11)
+                        )
+                    }
 
-                for index in stride(from: 0, to: points.count - 1, by: 2) {
-                    var line = Path()
-                    line.move(to: points[index])
-                    line.addLine(to: points[(index + 1) % points.count])
-                    context.stroke(
-                        line,
-                        with: .color(accent.opacity(0.22)),
-                        lineWidth: 1
-                    )
-                }
+                    for index in stride(from: 0, to: points.count - 1, by: 2) {
+                        var line = Path()
+                        line.move(to: points[index])
+                        line.addLine(to: points[(index + 1) % points.count])
+                        context.stroke(
+                            line,
+                            with: .color(accent.opacity(0.22)),
+                            lineWidth: 1
+                        )
+                    }
 
-                for (index, point) in points.enumerated() {
-                    let pulse = 0.72 + 0.28 * sin(time * 2.2 + anchors[index].phase)
-                    let radius = 3.2 + CGFloat(pulse * 1.4)
-                    let glowRadius = radius * 4.5
-                    let glowRect = CGRect(
-                        x: point.x - glowRadius,
-                        y: point.y - glowRadius,
-                        width: glowRadius * 2,
-                        height: glowRadius * 2
-                    )
-                    context.fill(
-                        Path(ellipseIn: glowRect),
-                        with: .color(accent.opacity(0.08 * pulse))
-                    )
-                    let dotRect = CGRect(
-                        x: point.x - radius / 2,
-                        y: point.y - radius / 2,
-                        width: radius,
-                        height: radius
-                    )
-                    context.fill(
-                        Path(ellipseIn: dotRect),
-                        with: .color(accent.opacity(0.92))
-                    )
+                    for (index, point) in points.enumerated() {
+                        let pulse = 0.72 + 0.28 * sin(time * 2.2 + anchors[index].phase)
+                        let radius = 3.2 + CGFloat(pulse * 1.4)
+                        let glowRadius = radius * 4.5
+                        let glowRect = CGRect(
+                            x: point.x - glowRadius,
+                            y: point.y - glowRadius,
+                            width: glowRadius * 2,
+                            height: glowRadius * 2
+                        )
+                        context.fill(
+                            Path(ellipseIn: glowRect),
+                            with: .color(accent.opacity(0.08 * pulse))
+                        )
+                        let dotRect = CGRect(
+                            x: point.x - radius / 2,
+                            y: point.y - radius / 2,
+                            width: radius,
+                            height: radius
+                        )
+                        context.fill(
+                            Path(ellipseIn: dotRect),
+                            with: .color(accent.opacity(0.92))
+                        )
+                    }
                 }
+                .frame(width: proxy.size.width, height: proxy.size.height)
             }
-            .allowsHitTesting(false)
         }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+        .allowsHitTesting(false)
     }
 }
 
