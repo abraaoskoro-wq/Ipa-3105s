@@ -267,8 +267,11 @@ struct PatchProjectsView: View {
                         selectedGame = game
                     } label: {
                         VStack(alignment: .leading, spacing: 8) {
-                            Image(systemName: "gamecontroller.fill")
-                                .font(.body.weight(.bold))
+                            Image(game.logoAssetName)
+                                .resizable()
+                                .scaledToFill()
+                                .frame(width: 38, height: 38)
+                                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
                             Text(game.title)
                                 .font(.title3.weight(.heavy))
                             Text(selectedGame == game ? "Selecionado" : "Toque para selecionar")
@@ -565,6 +568,13 @@ private enum InjectorGame: String, CaseIterable, Identifiable {
         switch self {
         case .freeFire: return "FREE FIRE"
         case .freeFireMax: return "FREE FIRE MAX"
+        }
+    }
+
+    var logoAssetName: String {
+        switch self {
+        case .freeFire: return "FreeFireLogo"
+        case .freeFireMax: return "FreeFireMaxLogo"
         }
     }
 }
