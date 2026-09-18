@@ -421,6 +421,7 @@ final class PatchProjectStore: ObservableObject {
     }
 
     private func requestPassword(pending: PendingUnlock) {
+        reload()
         pendingUnlock = pending
         passwordRequest = PatchPasswordRequest(
             summary: pending.summary,
