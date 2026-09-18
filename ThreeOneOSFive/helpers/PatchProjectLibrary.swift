@@ -177,6 +177,15 @@ enum PatchProjectLibrary {
         )
     }
 
+    static func persistOrigin(
+        _ origin: PatchPackageOrigin,
+        packageID: UUID,
+        fileManager: FileManager = .default
+    ) throws {
+        let url = try originFileURL(packageID: packageID, fileManager: fileManager)
+        try saveOrigin(origin, to: url)
+    }
+
     static func overlappingTargetPath(
         in project: PatchProject,
         excludingPackageID: UUID,

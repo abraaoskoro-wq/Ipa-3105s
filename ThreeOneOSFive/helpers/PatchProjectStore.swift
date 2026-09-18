@@ -454,10 +454,21 @@ final class PatchProjectStore: ObservableObject {
         }
         if summary.isPasswordProtected {
             guard let password else {
+                let placeholderURL = try PatchProjectLibrary.save(
+                    data: data,
+                    projectName: origin?.packageIdentifier ?? summary.packageID.uuidString,
+                    existingURL: existingURL
+                )
+                if let origin {
+                    try PatchProjectLibrary.persistOrigin(
+                        origin,
+                        packageID: summary.packageID
+                    )
+                }
                 return PendingUnlock(
                     data: data,
                     summary: summary,
-                    existingURL: existingURL,
+                    existingURL: placeholderURL,
                     origin: origin
                 )
             }

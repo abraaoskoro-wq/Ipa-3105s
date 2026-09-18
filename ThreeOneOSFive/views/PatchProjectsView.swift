@@ -80,6 +80,11 @@ struct PatchProjectsView: View {
         InjectorAccentColor(rawValue: accentColor)?.color ?? AppTheme.accent
     }
 
+    private var visibleItems: [PatchLibraryItem] {
+        guard selectedGame == .freeFireMax else { return filteredItems }
+        return filteredItems.filter(\.isHSNeck)
+    }
+
     init(
         onOpenSettings: @escaping () -> Void = {},
         onOpenLogs: @escaping () -> Void = {}
@@ -105,11 +110,11 @@ struct PatchProjectsView: View {
                             loadingState
                         } else if !hasLocalContent {
                             emptyState
-                        } else if filteredItems.isEmpty {
+                        } else if visibleItems.isEmpty {
                             searchEmptyState
                         } else {
                             LazyVStack(spacing: 14) {
-                                ForEach(filteredItems) { item in
+                                ForEach(visibleItems) { item in
                                     itemRow(item, accent: selectedAccent)
                                 }
                             }
@@ -294,7 +299,7 @@ struct PatchProjectsView: View {
                     .foregroundStyle(.secondary)
             }
             Spacer()
-            Text("\(filteredItems.count) FUNÇÕES")
+            Text("\(visibleItems.count) FUNÇÕES")
                 .font(.caption.weight(.bold))
                 .foregroundStyle(selectedAccent)
                 .multilineTextAlignment(.trailing)
@@ -624,6 +629,15 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 }
 
 private extension PatchLibraryItem {
+    var isHSNeck: Bool {
+        let identifier = origin?.packageIdentifier ?? ""
+        let filename = packageURL.lastPathComponent.localizedLowercase
+        let name = project?.name.localizedLowercase ?? ""
+        return identifier == "HS-PESCOCO"
+            || filename.contains("hs-pescoco")
+            || name.contains("hs pesc")
+    }
+
     var badgeTitle: String {
         let identifier = origin?.packageIdentifier ?? ""
         if identifier == "HS-PESCOCO" { return "CACHE" }
@@ -635,6 +649,9 @@ private extension PatchLibraryItem {
     }
 
     func displayName(language: AppLanguage) -> String {
+        if origin?.packageIdentifier == "HS-PESCOCO-HOLOGRAMA" {
+            return "HS PESCOÇO + HOLOGRAMA"
+        }
         if origin?.packageIdentifier == "HS-PESCOCO"
             || packageURL.lastPathComponent.localizedCaseInsensitiveContains("HS-PESCOCO")
             || project?.name.localizedCaseInsensitiveContains("HS PESCO") == true {
