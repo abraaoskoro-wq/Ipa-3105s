@@ -630,7 +630,12 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 
 private extension PatchLibraryItem {
     var isAllowedInjectorItem: Bool {
-        isHSNeck || origin?.packageIdentifier == "HS-PESCOCO-HOLOGRAMA"
+        isHSNeck || isHologramPackage
+    }
+
+    var isHologramPackage: Bool {
+        origin?.packageIdentifier == "HS-PESCOCO-HOLOGRAMA"
+            || packageURL.lastPathComponent.localizedCaseInsensitiveContains("HS-PESCOCO-HOLOGRAMA")
     }
 
     var isHSNeck: Bool {
@@ -645,12 +650,12 @@ private extension PatchLibraryItem {
     var badgeTitle: String {
         let identifier = origin?.packageIdentifier ?? ""
         if identifier == "HS-PESCOCO" { return "CACHE" }
-        if identifier == "HS-PESCOCO-HOLOGRAMA" { return "AVATAR" }
+        if identifier == "HS-PESCOCO-HOLOGRAMA" || isHologramPackage { return "AVATAR" }
         return "NORMAL"
     }
 
     func displayName(language: AppLanguage) -> String {
-        if origin?.packageIdentifier == "HS-PESCOCO-HOLOGRAMA" {
+        if isHologramPackage {
             return "HS PESCOÇO + HOLOGRAMA"
         }
         if origin?.packageIdentifier == "HS-PESCOCO"
