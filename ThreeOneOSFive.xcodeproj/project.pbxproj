@@ -77,6 +77,7 @@
 			3105A211 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3105A031; };
 			3105M200 /* HS-PESCOCO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M100; };
 			3105M201 /* SATURO-GOJO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M102; };
+			3105M202 /* HS-PESCOCO-HOLOGRAMA.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M103; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -169,6 +170,7 @@
 			3105B123 /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 			3105M100 /* HS-PESCOCO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HS-PESCOCO.3105"; sourceTree = "<group>"; };
 			3105M102 /* SATURO-GOJO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SATURO-GOJO.3105"; sourceTree = "<group>"; };
+			3105M103 /* HS-PESCOCO-HOLOGRAMA.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HS-PESCOCO-HOLOGRAMA.3105"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -213,6 +215,7 @@
 				children = (
 					3105M100 /* HS-PESCOCO.3105 */,
 					3105M102 /* SATURO-GOJO.3105 */,
+					3105M103 /* HS-PESCOCO-HOLOGRAMA.3105 */,
 				);
 				path = EmbeddedPackages;
 				sourceTree = "<group>";
@@ -389,6 +392,7 @@
 					3105A228,
 					3105M200,
 					3105M201,
+					3105M202,
 				);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

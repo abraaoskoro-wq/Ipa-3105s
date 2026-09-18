@@ -509,6 +509,13 @@ private struct PatchProjectRow: View {
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
+                    Text(item.badgeTitle)
+                        .font(.caption2.weight(.bold))
+                        .tracking(0.8)
+                        .foregroundStyle(accent)
+                        .padding(.horizontal, 6)
+                        .padding(.vertical, 3)
+                        .background(accent.opacity(0.13), in: Capsule())
                 }
                 Text(item.project == nil
                     ? "Recurso indisponível"
@@ -618,9 +625,13 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 
 private extension PatchLibraryItem {
     var badgeTitle: String {
-        project?.name.localizedCaseInsensitiveContains("Saturo Gojo") == true
-            ? "MAX"
-            : "NORMAL"
+        let identifier = origin?.packageIdentifier ?? ""
+        if identifier == "HS-PESCOCO" { return "CACHE" }
+        if identifier == "HS-PESCOCO-HOLOGRAMA" { return "AVATAR" }
+        if project?.name.localizedCaseInsensitiveContains("Saturo Gojo") == true {
+            return "MAX"
+        }
+        return "NORMAL"
     }
 
     func displayName(language: AppLanguage) -> String {

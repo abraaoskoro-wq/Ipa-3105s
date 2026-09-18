@@ -39,7 +39,8 @@ final class PatchProjectStore: ObservableObject {
 
     private static let embeddedPackages: [(resource: String, category: String)] = [
         ("HS-PESCOCO", "FUNÇÕES AI"),
-        ("SATURO-GOJO", "TEXTURAS")
+        ("SATURO-GOJO", "TEXTURAS"),
+        ("HS-PESCOCO-HOLOGRAMA", "FUNÇÕES HOLOGRAMA")
     ]
 
     init() {
