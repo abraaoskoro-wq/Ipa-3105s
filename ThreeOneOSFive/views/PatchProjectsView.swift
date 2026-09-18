@@ -98,7 +98,7 @@ struct PatchProjectsView: View {
             ZStack {
                 InjectorBackground(accent: selectedAccent)
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 20) {
+                    VStack(alignment: .leading, spacing: 14) {
                         gameSelector
                         performanceHeader
                         if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
@@ -115,9 +115,9 @@ struct PatchProjectsView: View {
                             }
                         }
                     }
-                    .padding(.horizontal, 18)
-                    .padding(.top, 10)
-                    .padding(.bottom, 32)
+                    .padding(.horizontal, 16)
+                    .padding(.top, 6)
+                    .padding(.bottom, 24)
                 }
             }
             .navigationTitle(language.text("tab.inject"))
@@ -252,27 +252,27 @@ struct PatchProjectsView: View {
     private var gameSelector: some View {
         VStack(alignment: .leading, spacing: 10) {
             Text("FUNÇÕES EXTERNAL")
-                .font(.title3.weight(.bold))
+                .font(.title3.weight(.heavy))
                 .foregroundStyle(.primary)
                 .frame(maxWidth: .infinity, alignment: .center)
 
-            HStack(spacing: 14) {
+            HStack(spacing: 12) {
                 ForEach(InjectorGame.allCases) { game in
                     Button {
                         selectedGame = game
                     } label: {
-                        VStack(alignment: .leading, spacing: 12) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Image(systemName: "gamecontroller.fill")
-                                .font(.title3)
+                                .font(.body.weight(.bold))
                             Text(game.title)
-                                .font(.title3.weight(.bold))
+                                .font(.title3.weight(.heavy))
                             Text(selectedGame == game ? "Selecionado" : "Toque para selecionar")
-                                .font(.body.weight(.medium))
+                                .font(.subheadline.weight(.medium))
                                 .foregroundStyle(selectedGame == game ? .white : .secondary)
                         }
                         .foregroundStyle(selectedGame == game ? .white : .primary)
-                        .frame(maxWidth: .infinity, minHeight: 172, alignment: .leading)
-                        .padding(18)
+                        .frame(maxWidth: .infinity, minHeight: 126, alignment: .leading)
+                        .padding(14)
                         .background(
                             RoundedRectangle(cornerRadius: 28, style: .continuous)
                                 .fill(selectedGame == game ? selectedAccent : Color(uiColor: .secondarySystemBackground))
@@ -285,17 +285,17 @@ struct PatchProjectsView: View {
     }
 
     private var performanceHeader: some View {
-        HStack(alignment: .bottom) {
-            VStack(alignment: .leading, spacing: 5) {
+        HStack(alignment: .bottom, spacing: 8) {
+            VStack(alignment: .leading, spacing: 4) {
                 Text("PRECISÃO & DESEMPENHO")
-                    .font(.title2.weight(.heavy))
+                    .font(.title3.weight(.heavy))
                 Text("Recursos de precisão e desempenho")
-                    .font(.body)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
             }
             Spacer()
             Text("\(filteredItems.count) FUNÇÕES")
-                .font(.subheadline.weight(.bold))
+                .font(.caption.weight(.bold))
                 .foregroundStyle(selectedAccent)
                 .multilineTextAlignment(.trailing)
         }
@@ -501,11 +501,11 @@ private struct PatchProjectRow: View {
                     .font(.system(size: 20, weight: .semibold))
                     .foregroundStyle(accent)
             }
-            .frame(width: 52, height: 52)
-            VStack(alignment: .leading, spacing: 4) {
+            .frame(width: 44, height: 44)
+            VStack(alignment: .leading, spacing: 3) {
                 HStack(spacing: 8) {
                     Text(item.displayName(language: language))
-                        .font(.title3.weight(.heavy))
+                        .font(.body.weight(.heavy))
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
@@ -513,7 +513,7 @@ private struct PatchProjectRow: View {
                 Text(item.project == nil
                     ? "Recurso indisponível"
                     : "Recurso pré-carregado do Free Fire.")
-                    .font(.body)
+                    .font(.subheadline)
                     .foregroundStyle(.secondary)
                     .lineLimit(2)
             }
@@ -531,8 +531,8 @@ private struct PatchProjectRow: View {
                 .disabled(store.isBusy)
             }
         }
-        .padding(.horizontal, 18)
-        .padding(.vertical, 20)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 14)
         .background(
             RoundedRectangle(cornerRadius: 26, style: .continuous)
                 .fill(Color(uiColor: .secondarySystemBackground).opacity(0.78))
