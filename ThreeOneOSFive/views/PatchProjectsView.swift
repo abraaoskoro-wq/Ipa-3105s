@@ -587,8 +587,71 @@ private struct InjectorBackground: View {
                 startRadius: 10,
                 endRadius: 460
             )
+            InjectorParticleField(accent: accent)
         }
         .ignoresSafeArea()
+    }
+}
+
+private struct InjectorParticleField: View {
+    let accent: Color
+
+    private let anchors: [(x: CGFloat, y: CGFloat, phase: Double)] = [
+        (0.08, 0.28, 0.0), (0.78, 0.25, 1.0), (0.22, 0.57, 2.0),
+        (0.87, 0.68, 0.5), (0.47, 0.78, 1.5), (0.63, 0.44, 2.5),
+        (0.07, 0.76, 1.2), (0.93, 0.50, 2.2)
+    ]
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0)) { timeline in
+            Canvas { context, size in
+                let time = timeline.date.timeIntervalSinceReferenceDate
+                let points = anchors.map { anchor in
+                    CGPoint(
+                        x: size.width * anchor.x + CGFloat(sin(time * 0.45 + anchor.phase) * 7),
+                        y: size.height * anchor.y + CGFloat(cos(time * 0.38 + anchor.phase) * 11)
+                    )
+                }
+
+                for index in stride(from: 0, to: points.count - 1, by: 2) {
+                    var line = Path()
+                    line.move(to: points[index])
+                    line.addLine(to: points[(index + 1) % points.count])
+                    context.stroke(
+                        line,
+                        with: .color(accent.opacity(0.22)),
+                        lineWidth: 1
+                    )
+                }
+
+                for (index, point) in points.enumerated() {
+                    let pulse = 0.72 + 0.28 * sin(time * 2.2 + anchors[index].phase)
+                    let radius = 3.2 + CGFloat(pulse * 1.4)
+                    let glowRadius = radius * 4.5
+                    let glowRect = CGRect(
+                        x: point.x - glowRadius,
+                        y: point.y - glowRadius,
+                        width: glowRadius * 2,
+                        height: glowRadius * 2
+                    )
+                    context.fill(
+                        Path(ellipseIn: glowRect),
+                        with: .color(accent.opacity(0.08 * pulse))
+                    )
+                    let dotRect = CGRect(
+                        x: point.x - radius / 2,
+                        y: point.y - radius / 2,
+                        width: radius,
+                        height: radius
+                    )
+                    context.fill(
+                        Path(ellipseIn: dotRect),
+                        with: .color(accent.opacity(0.92))
+                    )
+                }
+            }
+            .allowsHitTesting(false)
+        }
     }
 }
 
