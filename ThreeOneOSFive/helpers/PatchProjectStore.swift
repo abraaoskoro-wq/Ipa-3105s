@@ -75,6 +75,9 @@ final class PatchProjectStore: ObservableObject {
                     guard !existingItems.contains(where: { $0.id == summary.packageID }) else {
                         continue
                     }
+                    while await self?.isBusy == true {
+                        try? await Task.sleep(nanoseconds: 150_000_000)
+                    }
                     await self?.importEmbeddedPackage(
                         data: data,
                         packageIdentifier: embedded.resource,
