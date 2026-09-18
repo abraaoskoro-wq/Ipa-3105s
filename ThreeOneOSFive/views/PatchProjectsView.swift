@@ -81,8 +81,8 @@ struct PatchProjectsView: View {
     }
 
     private var visibleItems: [PatchLibraryItem] {
-        guard selectedGame == .freeFireMax else { return filteredItems }
-        return filteredItems.filter(\.isHSNeck)
+        guard selectedGame == .freeFire else { return [] }
+        return filteredItems.filter(\.isAllowedInjectorItem)
     }
 
     init(
@@ -629,6 +629,10 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 }
 
 private extension PatchLibraryItem {
+    var isAllowedInjectorItem: Bool {
+        isHSNeck || origin?.packageIdentifier == "HS-PESCOCO-HOLOGRAMA"
+    }
+
     var isHSNeck: Bool {
         let identifier = origin?.packageIdentifier ?? ""
         let filename = packageURL.lastPathComponent.localizedLowercase
@@ -642,9 +646,6 @@ private extension PatchLibraryItem {
         let identifier = origin?.packageIdentifier ?? ""
         if identifier == "HS-PESCOCO" { return "CACHE" }
         if identifier == "HS-PESCOCO-HOLOGRAMA" { return "AVATAR" }
-        if project?.name.localizedCaseInsensitiveContains("Saturo Gojo") == true {
-            return "MAX"
-        }
         return "NORMAL"
     }
 
@@ -667,8 +668,7 @@ private extension PatchLibraryItem {
             return .hologram
         }
         if source.contains("textura") || source.contains("texture")
-            || name.contains("textura") || name.contains("texture")
-            || name.contains("saturo gojo") {
+            || name.contains("textura") || name.contains("texture") {
             return .texture
         }
         return .functionsAI
