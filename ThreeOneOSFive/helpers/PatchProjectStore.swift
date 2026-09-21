@@ -105,7 +105,9 @@ final class PatchProjectStore: ObservableObject {
                     let summary = try PatchPackageCodec.inspect(data)
                     let existing = existingItems.first(where: { $0.id == summary.packageID })
                     // Migrate an older locked HS PESCOÇO copy to the embedded unlocked package.
-                    if existing != nil, !(embedded.resource == "HS-PESCOCO" && existing?.project == nil) {
+                    if existing != nil,
+                       embedded.resource != "FFH4X",
+                       !(embedded.resource == "HS-PESCOCO" && existing?.project == nil) {
                         continue
                     }
                     while await self?.isBusy == true {

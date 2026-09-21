@@ -532,13 +532,15 @@ private struct PatchProjectRow: View {
                         .foregroundStyle(.primary)
                         .lineLimit(2)
                         .minimumScaleFactor(0.82)
-                    Text(item.badgeTitle)
-                        .font(.caption2.weight(.bold))
-                        .tracking(0.8)
-                        .foregroundStyle(accent)
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 3)
-                        .background(accent.opacity(0.13), in: Capsule())
+                    if !item.badgeTitle.isEmpty {
+                        Text(item.badgeTitle)
+                            .font(.caption2.weight(.bold))
+                            .tracking(0.8)
+                            .foregroundStyle(accent)
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 3)
+                            .background(accent.opacity(0.13), in: Capsule())
+                    }
                 }
                 Text(item.project == nil
                     ? "Recurso indisponível"
@@ -766,7 +768,7 @@ private extension PatchLibraryItem {
         let identifier = origin?.packageIdentifier ?? ""
         if identifier == "HS-PESCOCO" || isAIMScopeCache { return "CACHE" }
         if identifier == "HS-PESCOCO-HOLOGRAMA" || isHologramPackage { return "AVATAR" }
-        if isPanelPackage { return "PAINÉIS" }
+        if isPanelPackage { return "" }
         return "NORMAL"
     }
 
