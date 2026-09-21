@@ -130,6 +130,11 @@ struct PatchProjectsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
+                        Button {
+                            store.importBundledPackage(resource: "FFH4X", category: "PAINÉIS")
+                        } label: {
+                            Label("Importar FFH4X", systemImage: "square.and.arrow.down")
+                        }
                         ForEach(InjectorAccentColor.allCases) { color in
                             Button {
                                 accentColor = color.rawValue

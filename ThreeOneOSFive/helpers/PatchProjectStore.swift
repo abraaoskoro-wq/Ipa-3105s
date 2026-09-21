@@ -40,8 +40,7 @@ final class PatchProjectStore: ObservableObject {
     private static let embeddedPackages: [(resource: String, category: String)] = [
         ("HS-PESCOCO", "FUNÇÕES AI"),
         ("HS-PESCOCO-HOLOGRAMA", "FUNÇÕES HOLOGRAMA"),
-        ("AIMSCOPE-ESP100", "CACHE AIMSCOPE ESP 100%"),
-        ("FFH4X", "PAINÉIS")
+        ("AIMSCOPE-ESP100", "CACHE AIMSCOPE ESP 100%")
     ]
 
     init() {
@@ -54,6 +53,26 @@ final class PatchProjectStore: ObservableObject {
 
     func reload() {
         items = PatchProjectLibrary.load()
+    }
+
+    func importBundledPackage(resource: String, category: String) {
+        guard !isBusy,
+              let packageURL = Bundle.main.url(forResource: resource, withExtension: "3105") else {
+            return
+        }
+        do {
+            let data = try PatchProjectLibrary.readPackage(at: packageURL)
+            let origin = PatchPackageOrigin(
+                repositoryName: category,
+                repositoryURL: URL(string: "https://www.mediafire.com")!,
+                packageIdentifier: resource
+            )
+            _ = importPackage(data: data, origin: origin)
+        } catch let error as PatchPackageError {
+            present(error)
+        } catch {
+            present(.unsupportedFormat)
+        }
     }
 
     private func finishInitialLoad(_ loadedItems: [PatchLibraryItem]) {
