@@ -275,7 +275,11 @@ struct PatchProjectsView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                             Text(game.title)
                                 .font(.title3.weight(.heavy))
-                                .frame(height: 28, alignment: .topLeading)
+                                .lineLimit(2)
+                                .minimumScaleFactor(0.78)
+                                .allowsTightening(true)
+                                .fixedSize(horizontal: false, vertical: true)
+                                .frame(minHeight: 28, alignment: .topLeading)
                             Text(selectedGame == game ? "Selecionado" : "Toque para selecionar")
                                 .font(.subheadline.weight(.medium))
                                 .foregroundStyle(selectedGame == game ? .white : .secondary)
@@ -713,7 +717,7 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 
 private extension PatchLibraryItem {
     var isAllowedInjectorItem: Bool {
-        isHSNeck || isHologramPackage
+        isHSNeck || isHologramPackage || isAIMScopeCache
     }
 
     var isHologramPackage: Bool {
@@ -730,9 +734,18 @@ private extension PatchLibraryItem {
             || name.contains("hs pesc")
     }
 
+    var isAIMScopeCache: Bool {
+        let identifier = origin?.packageIdentifier ?? ""
+        let filename = packageURL.lastPathComponent.localizedLowercase
+        let name = project?.name.localizedLowercase ?? ""
+        return identifier == "AIMSCOPE-ESP100"
+            || filename.contains("aimscope")
+            || name.contains("aimscope")
+    }
+
     var badgeTitle: String {
         let identifier = origin?.packageIdentifier ?? ""
-        if identifier == "HS-PESCOCO" { return "CACHE" }
+        if identifier == "HS-PESCOCO" || isAIMScopeCache { return "CACHE" }
         if identifier == "HS-PESCOCO-HOLOGRAMA" || isHologramPackage { return "AVATAR" }
         return "NORMAL"
     }
@@ -745,6 +758,9 @@ private extension PatchLibraryItem {
             || packageURL.lastPathComponent.localizedCaseInsensitiveContains("HS-PESCOCO")
             || project?.name.localizedCaseInsensitiveContains("HS PESCO") == true {
             return "HS PESCOÇO"
+        }
+        if isAIMScopeCache {
+            return "AIM SCOPE + ESP"
         }
         return project?.name ?? language.text("patch.locked_project")
     }

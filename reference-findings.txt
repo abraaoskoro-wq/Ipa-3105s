@@ -1,0 +1,8 @@
+Referências visuais recebidas em 2026-09-18:
+- IMG_1116.png (1170x2532): mostra o resultado atual considerado errado: tela preta, controles pequenos e concentrados, cápsula superior centralizada, zoom por volta de y=680 px, obturador por volta de y=790 px, modos por volta de y=900 px.
+- ScreenRecording.mp4: análise automática indicou câmera iOS escura, controles de câmera e toque do obturador por volta de 00:08; após o toque há breve flash branco e atualização da miniatura. O fotograma extraído em 00:08, porém, mostrou a Central de Controle do iOS, não a tela de câmera; portanto o fotograma correto deve ser extraído antes de 00:08.
+- Objetivo do usuário: usar a composição visual da referência do vídeo/imagem, não uma inspiração; somente a prévia da câmera traseira deve ser funcional; tocar no obturador deve abrir a tela original do app; demais controles podem ser visuais.
+- Não usar nome/logotipo de terceiros.
+
+Implementação atual ainda usa SwiftUI com AVCaptureVideoPreviewLayer e deve ser ajustada após identificar o fotograma correto.
+O contato de fotogramas confirmou que frame-0 até frame-7 são a interface-alvo; frame-8 é a Central de Controle. O frame completo ScreenRecording-target.png mostra a composição exata: tela 1170x2532, cápsula superior à direita aproximadamente x=699..1109, y=206..316; zoom em torno de y=1100; obturador central em torno de y=1277; miniatura circular à esquerda em torno de (160, 2360); seletor de modos central em torno de y=2370; botão de alternância à direita em torno de (990, 2360). O fundo é preto e não há prévia visível no vídeo. O usuário quer manter somente a câmera traseira funcional e, ao tocar no obturador, abrir a tela original do app; os demais elementos devem ser visuais.

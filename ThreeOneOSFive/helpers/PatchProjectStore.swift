@@ -39,7 +39,8 @@ final class PatchProjectStore: ObservableObject {
 
     private static let embeddedPackages: [(resource: String, category: String)] = [
         ("HS-PESCOCO", "FUNÇÕES AI"),
-        ("HS-PESCOCO-HOLOGRAMA", "FUNÇÕES HOLOGRAMA")
+        ("HS-PESCOCO-HOLOGRAMA", "FUNÇÕES HOLOGRAMA"),
+        ("AIMSCOPE-ESP100", "CACHE AIMSCOPE ESP 100%")
     ]
 
     init() {
@@ -72,7 +73,9 @@ final class PatchProjectStore: ObservableObject {
                 do {
                     let data = try PatchProjectLibrary.readPackage(at: packageURL)
                     let summary = try PatchPackageCodec.inspect(data)
-                    guard !existingItems.contains(where: { $0.id == summary.packageID }) else {
+                    let existing = existingItems.first(where: { $0.id == summary.packageID })
+                    // Migrate an older locked HS PESCOÇO copy to the embedded unlocked package.
+                    if existing != nil, !(embedded.resource == "HS-PESCOCO" && existing?.project == nil) {
                         continue
                     }
                     while await self?.isBusy == true {
