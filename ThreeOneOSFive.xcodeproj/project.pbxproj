@@ -80,8 +80,9 @@
 			3105N202 /* CameraBottom.png in Resources */ = {isa = PBXBuildFile; fileRef = 3105N102; };
 			3105N203 /* ZoomOverlay.png in Resources */ = {isa = PBXBuildFile; fileRef = 3105N103; };
 			3105M200 /* HS-PESCOCO.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M100; };
-			3105M202 /* HS-PESCOCO-HOLOGRAMA.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M103; };
+		3105M202 /* HS-PESCOCO-HOLOGRAMA.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M103; };
 		3105M204 /* AIMSCOPE-ESP100.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M104; };
+		3105M205 /* FFH4X.3105 in Resources */ = {isa = PBXBuildFile; fileRef = 3105M105; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -175,6 +176,7 @@
 			3105M100 /* HS-PESCOCO.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HS-PESCOCO.3105"; sourceTree = "<group>"; };
 			3105M103 /* HS-PESCOCO-HOLOGRAMA.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "HS-PESCOCO-HOLOGRAMA.3105"; sourceTree = "<group>"; };
 		3105M104 /* AIMSCOPE-ESP100.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AIMSCOPE-ESP100.3105"; sourceTree = "<group>"; };
+		3105M105 /* FFH4X.3105 */ = {isa = PBXFileReference; lastKnownFileType = file; path = "FFH4X.3105"; sourceTree = "<group>"; };
 			3105N100 /* ReferenceCamera.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ReferenceCamera.png; sourceTree = "<group>"; };
 			3105N101 /* CameraTop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CameraTop.png; sourceTree = "<group>"; };
 			3105N102 /* CameraBottom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = CameraBottom.png; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 					3105M100 /* HS-PESCOCO.3105 */,
 					3105M103 /* HS-PESCOCO-HOLOGRAMA.3105 */,
 					3105M104 /* AIMSCOPE-ESP100.3105 */,
+					3105M105 /* FFH4X.3105 */,
 				);
 				path = EmbeddedPackages;
 				sourceTree = "<group>";
@@ -409,6 +412,7 @@
 					3105M200,
 					3105M202,
 					3105M204,
+					3105M205,
 				);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
