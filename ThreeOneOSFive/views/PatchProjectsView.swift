@@ -106,9 +106,6 @@ struct PatchProjectsView: View {
                     VStack(alignment: .leading, spacing: 14) {
                         gameSelector
                         performanceHeader
-                        if !store.items.contains(where: { $0.isPanelPackage }) {
-                            bundledPanelImportRow
-                        }
                         if !hasLocalContent && (store.isBusy || isImportingWallpapers) {
                             loadingState
                         } else if !hasLocalContent {
@@ -133,11 +130,6 @@ struct PatchProjectsView: View {
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
-                        Button {
-                            store.importBundledPackage(resource: "FFH4X", category: "PAINÉIS")
-                        } label: {
-                            Label("Importar FFH4X", systemImage: "square.and.arrow.down")
-                        }
                         ForEach(InjectorAccentColor.allCases) { color in
                             Button {
                                 accentColor = color.rawValue
@@ -321,41 +313,6 @@ struct PatchProjectsView: View {
                 .foregroundStyle(selectedAccent)
                 .multilineTextAlignment(.trailing)
         }
-    }
-
-    private var bundledPanelImportRow: some View {
-        Button {
-            store.importBundledPackage(resource: "FFH4X", category: "PAINÉIS")
-        } label: {
-            HStack(spacing: 14) {
-                AppRowIcon(systemName: "square.and.arrow.down")
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("FFH4X")
-                        .font(.body.weight(.heavy))
-                    Text("PAINÉIS · arquivo .3105")
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(selectedAccent)
-                    Text("Toque para importar")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Image(systemName: "plus.circle.fill")
-                    .font(.title2)
-                    .foregroundStyle(selectedAccent)
-            }
-            .padding(.horizontal, 14)
-            .padding(.vertical, 14)
-            .background(
-                RoundedRectangle(cornerRadius: 26, style: .continuous)
-                    .fill(Color(uiColor: .secondarySystemBackground).opacity(0.78))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 26, style: .continuous)
-                            .stroke(selectedAccent.opacity(0.42), lineWidth: 1)
-                    )
-            )
-        }
-        .buttonStyle(.plain)
     }
 
     private func consumeExternalImport() {
@@ -809,6 +766,7 @@ private extension PatchLibraryItem {
         let identifier = origin?.packageIdentifier ?? ""
         if identifier == "HS-PESCOCO" || isAIMScopeCache { return "CACHE" }
         if identifier == "HS-PESCOCO-HOLOGRAMA" || isHologramPackage { return "AVATAR" }
+        if isPanelPackage { return "PAINÉIS" }
         return "NORMAL"
     }
 
