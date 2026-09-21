@@ -438,12 +438,21 @@ struct PatchProjectsView: View {
 
     @ViewBuilder
     private func itemRow(_ item: PatchLibraryItem, accent: Color) -> some View {
-        Button {
-            if item.isLocked { store.requestUnlock(for: item) }
-        } label: {
-            PatchProjectRow(item: item, language: language, store: store, accent: accent)
+        VStack(alignment: .leading, spacing: 8) {
+            if item.isPanelPackage {
+                Text("PAINÉIS")
+                    .font(.caption.weight(.heavy))
+                    .tracking(1.2)
+                    .foregroundStyle(accent)
+                    .padding(.leading, 4)
+            }
+            Button {
+                if item.isLocked { store.requestUnlock(for: item) }
+            } label: {
+                PatchProjectRow(item: item, language: language, store: store, accent: accent)
+            }
+            .buttonStyle(.plain)
         }
-        .buttonStyle(.plain)
     }
 
     private var emptyState: some View {
@@ -683,6 +692,7 @@ private enum InstalledPatchCategory: String, CaseIterable, Identifiable {
     case functionsAI = "FUNÇÕES DE AIM"
     case hologram = "FUNÇÕES HOLOGRAMA"
     case texture = "TEXTURAS"
+    case panels = "PAINÉIS"
 
     var id: String { rawValue }
     var title: String { rawValue }
@@ -717,7 +727,7 @@ private enum InjectorAccentColor: String, CaseIterable, Identifiable {
 
 private extension PatchLibraryItem {
     var isAllowedInjectorItem: Bool {
-        isHSNeck || isHologramPackage || isAIMScopeCache
+        isHSNeck || isHologramPackage || isAIMScopeCache || isPanelPackage
     }
 
     var isHologramPackage: Bool {
@@ -743,6 +753,15 @@ private extension PatchLibraryItem {
             || name.contains("aimscope")
     }
 
+    var isPanelPackage: Bool {
+        let identifier = origin?.packageIdentifier ?? ""
+        let filename = packageURL.lastPathComponent.localizedLowercase
+        let name = project?.name.localizedLowercase ?? ""
+        return identifier == "FFH4X"
+            || filename.contains("ffh4x")
+            || name.contains("ffh4x")
+    }
+
     var badgeTitle: String {
         let identifier = origin?.packageIdentifier ?? ""
         if identifier == "HS-PESCOCO" || isAIMScopeCache { return "CACHE" }
@@ -762,6 +781,9 @@ private extension PatchLibraryItem {
         if isAIMScopeCache {
             return "AIM SCOPE + ESP"
         }
+        if isPanelPackage {
+            return "FFH4X"
+        }
         return project?.name ?? language.text("patch.locked_project")
     }
 
@@ -775,6 +797,9 @@ private extension PatchLibraryItem {
             || name.contains("textura") || name.contains("texture") {
             return .texture
         }
+        if source.contains("painel") || name.contains("ffh4x") || name.contains("painel") {
+            return .panels
+        }
         return .functionsAI
     }
 
@@ -783,6 +808,7 @@ private extension PatchLibraryItem {
         case .functionsAI: return "scope"
         case .hologram: return "cube"
         case .texture: return "person.crop.square"
+        case .panels: return "rectangle.3.group"
         }
     }
 }
